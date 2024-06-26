@@ -1,0 +1,45 @@
+import cv2 
+
+import numpy as np 
+
+  
+# Reads image from the disk using cv2.imread() function  
+
+img = cv2.imread('geeksforgeeks.png') 
+
+  
+# Apply identity kernel 
+# In an Identity Kernel matrix the value of the middle element is 1 
+# The values of all the other elements are 0 
+
+id_kernel = np.array([[0, 0, 0], 
+
+                    [0, 1, 0], 
+
+                    [0, 0, 0]]) 
+
+  
+# Filtered image is obtained using the variable flt_img 
+# cv2.fliter2D() is the function used 
+# src is the source of image(here, img) 
+# ddepth is destination depth. -1 will mean output image will have same depth as input image 
+# kernel is used for specifying the kernel operation (here, id_kernel) 
+
+flt_img = cv2.filter2D(src=img, ddepth=-1, kernel=id_kernel) 
+
+  
+# Display the filtered image using cv2.imshow() function 
+# Here, output image is same as input image since we are using identity kernel 
+
+cv2.imshow('Identity', flt_img) 
+
+  
+# cv2.waitkey(delay) function holds the screen till any key is pressed by the user 
+# It pauses the screen for delay milliseconds if the delay is a positive value 
+# It pauses the screen for a key event infinitely if the delay is 0 or negative 
+
+cv2.waitKey(0) 
+
+  
+# cv2.destroyAllWindows() function deletes all the GUI windows from memory 
+cv2.destroyAllWindows()
