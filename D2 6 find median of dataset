@@ -1,0 +1,11 @@
+import numpy as np
+
+# Define the dataset
+dataset = [3, 5, 8, 12, 7, 10, 15, 20, 18, 22, 25, 28, 30]
+
+# Apply Median filtering with a box filter of size 3
+filtered_dataset = [np.median(dataset[max(0, i-1):min(len(dataset), i+2)]) for i in range(len(dataset))]
+
+# Print the original dataset and the resulting filtered dataset
+print("Original Dataset:", dataset)
+print("Filtered Dataset:", filtered_dataset)
