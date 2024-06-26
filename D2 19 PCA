@@ -1,0 +1,47 @@
+import cv2
+import numpy as np
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# Step 1: Read the image
+image_path = r"C:\Users\Admin\Desktop\bg\palnt.jpg"  # Change this to your image path
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+if image is None:
+    print("Error: Image not found or path is incorrect")
+else:
+    # Flatten the image
+    original_shape = image.shape
+    flattened_image = image.flatten().reshape(1, -1)  # Reshape to 2D array
+
+    # Step 2: Apply PCA
+    # Number of components to keep (must be less than min(n_samples, n_features))
+    n_components = min(flattened_image.shape[0], flattened_image.shape[1], 10)
+    pca = PCA(n_components=n_components)
+
+    pca.fit(flattened_image)
+    transformed_image = pca.transform(flattened_image)
+
+    # Step 3: Analyze the Principal Components
+    # Inverse transform to reconstruct the image from the principal components
+    reconstructed_image = pca.inverse_transform(transformed_image)
+    reconstructed_image = reconstructed_image.reshape(original_shape)
+
+    # Display the original and reconstructed images
+    plt.figure(figsize=(10, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.title("Original Image")
+    plt.imshow(image, cmap='gray')
+    plt.axis('off')
+
+    plt.subplot(1, 2, 2)
+    plt.title("Reconstructed Image")
+    plt.imshow(reconstructed_image, cmap='gray')
+    plt.axis('off')
+
+    plt.show()
+
+    # Print the explained variance ratio
+    print("Explained variance ratio of each principal component:\n", pca.explained_variance_ratio_)
+    print("Total explained variance:", np.sum(pca.explained_variance_ratio_))
