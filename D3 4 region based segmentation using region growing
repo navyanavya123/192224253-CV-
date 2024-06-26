@@ -1,0 +1,36 @@
+import cv2
+import numpy as np
+
+def region_growing(img, seed, threshold=10):
+    h, w = img.shape
+    segmented_img = np.zeros((h, w), np.uint8)
+    segmented_img[seed] = 255
+    region_mean = img[seed]
+    region_size = 1
+    pixel_list = [seed]
+
+    while len(pixel_list) > 0:
+        x, y = pixel_list.pop(0)
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                if dx == 0 and dy == 0:
+                    continue
+                xn, yn = x + dx, y + dy
+                if 0 <= xn < h and 0 <= yn < w and segmented_img[xn, yn] == 0:
+                    intensity_difference = abs(int(img[xn, yn]) - int(region_mean))
+                    if intensity_difference < threshold:
+                        segmented_img[xn, yn] = 255
+                        pixel_list.append((xn, yn))
+                        region_size += 1
+                        region_mean = (region_mean * (region_size - 1) + img[xn, yn]) / region_size
+
+    return segmented_img
+
+# Load a grayscale image
+img = cv2.imread('path_to_image', cv2.IMREAD_GRAYSCALE)
+seed_point = (100, 100)  # example seed point
+segmented_image = region_growing(img, seed_point)
+
+cv2.imshow('Segmented Image', segmented_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
