@@ -1,0 +1,51 @@
+import cv2
+import numpy as np
+
+def split_and_merge(img, threshold=15):
+    def split(img, x, y, width, height):
+        if width < 2 or height < 2:
+            return None
+
+        region = img[y:y+height, x:x+width]
+        mean = np.mean(region)
+        std = np.std(region)
+
+        if std < threshold:
+            return mean
+
+        half_width, half_height = width // 2, height // 2
+
+        regions = [
+            split(img, x, y, half_width, half_height),
+            split(img, x + half_width, y, half_width, half_height),
+            split(img, x, y + half_height, half_width, half_height),
+            split(img, x + half_width, y + half_height, half_width, half_height)
+        ]
+
+        return regions
+
+    def merge(regions, img, x, y, width, height):
+        if isinstance(regions, float):
+            img[y:y+height, x:x+width] = regions
+            return
+
+        half_width, half_height = width // 2, height // 2
+
+        merge(regions[0], img, x, y, half_width, half_height)
+        merge(regions[1], img, x + half_width, y, half_width, half_height)
+        merge(regions[2], img, x, y + half_height, half_width, half_height)
+        merge(regions[3], img, x + half_width, y + half_height, half_width, half_height)
+
+    h, w = img.shape
+    regions = split(img, 0, 0, w, h)
+    merged_img = np.zeros((h, w), np.float32)
+    merge(regions, merged_img, 0, 0, w, h)
+    return merged_img.astype(np.uint8)
+
+# Load a grayscale image
+img = cv2.imread('path_to_image', cv2.IMREAD_GRAYSCALE)
+segmented_image = split_and_merge(img)
+
+cv2.imshow('Segmented Image', segmented_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
